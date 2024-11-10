@@ -8,58 +8,70 @@ const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET_KEY;
 
 module.exports.registerStudent = async (req, res) => {
-    console.log("Inside Controller")
+    console.log("Inside Controller");
+
     const { roll, name, course, email, contact, branch, year, semester, password } = req.body;
     console.log("req body : ", req.body);
+
     connection.query('SELECT * FROM student WHERE roll = ?', roll, async (err, response) => {
-        console.log("Response : ", response);
-        if (response.length > 0) {
-            return res.status(203).json({ "msg": "User is already registered." })
+        if (err) {
+            console.log("Query Error: ", err);
+            return res.status(500).json({ "msg": "Database query error." });
         }
-        else {
+
+        console.log("Response : ", response);
+
+        if (response && response.length > 0) {
+            return res.status(203).json({ "msg": "User is already registered." });
+        } else {
             const salt = await bcrypt.genSaltSync(10);
             const hashedPwd = await bcrypt.hash(password, salt);
             const data = req.body;
             data.password = hashedPwd;
+
             connection.query('INSERT INTO student SET ?', data, (err, response) => {
                 if (err) {
                     console.log("Insert Error: ", err);
-                }
-                else {
+                    return res.status(500).json({ "msg": "Error while registering user." });
+                } else {
                     console.log("Res: ", response);
+                    var token = jwt.sign(data, secretKey);
+                    return res.status(200).json({ "res": token, "msg": "Registered Successfully!!" });
                 }
             });
-            console.log("res: ", response);
-            console.log("Secret key jwt: ", secretKey)
-            var token = jwt.sign(data, secretKey);
-            return res.status(200).json({ "res": token, "msg": "Registered Succesfully!!" });
         }
-    })
-}
+    });
+};
 
 module.exports.loginStudent = async (req, res) => {
-    console.log("Inside Controller")
+    console.log("Inside Controller");
+
     const { roll, password } = req.body;
     console.log("req body : ", req.body);
+
     connection.query('SELECT * FROM student WHERE roll = ?', roll, async (err, response) => {
+        if (err) {
+            console.log("Query Error: ", err);
+            return res.status(500).json({ "msg": "Database query error." });
+        }
+
         console.log("Response : ", response);
-        if (response.length > 0) {
+
+        if (response && response.length > 0) {
             const pwdCheck = await bcrypt.compare(password, response[0].password);
             if (pwdCheck) {
                 const resData = JSON.stringify(response[0]);
                 var token = jwt.sign(resData, secretKey);
-                return res.status(200).json({ "msg": "Logged in succesfully!!.", "data": token })
+                return res.status(200).json({ "msg": "Logged in successfully!", "data": token });
+            } else {
+                return res.status(203).json({ "msg": "Invalid Credentials" });
             }
-            else {
-                return res.status(203).json({ "msg": "Invalid Credentials" })
-            }
+        } else {
+            return res.status(203).json({ "msg": "User not registered!" });
         }
-        else {
-            return res.status(203).json({ "msg": "User not registered!!" });
-            // console.log("res: ",response);
-        }
-    })
-}
+    });
+};
+
 
 module.exports.getSubjects = async (req, res) => {
     console.log("Inside Controller")

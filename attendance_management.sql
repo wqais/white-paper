@@ -1,3 +1,7 @@
+use attendance_management;
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin@456';
+flush privileges;
 -- phpMyAdmin SQL Dump
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
@@ -27,16 +31,17 @@ SET time_zone = "+00:00";
 -- Table structure for table `attendance`
 --
 
-CREATE TABLE `attendance` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `attendance` (
+  `id` int NOT NULL,
   `roll` varchar(255) NOT NULL,
-  `year` int(5) NOT NULL,
-  `semester` int(10) NOT NULL,
+  `year` int NOT NULL,
+  `semester` int NOT NULL,
   `subject` varchar(255) NOT NULL,
-  `date` date NOT NULL DEFAULT current_timestamp(),
+  `date` date NOT NULL,
   `status` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+drop table attendance;
 --
 -- Dumping data for table `attendance`
 --
@@ -157,19 +162,22 @@ CREATE TABLE `subjects` (
 --
 
 INSERT INTO `subjects` (`id`, `code`, `name`, `course`, `branch`, `semester`, `year`, `teacher_id`) VALUES
-(5, 'CS15104', 'Advanced Algorithms', 'btech', 'CSE', 5, 3, '11'),
+(5, 'CS15104', 'Advanced Algorithms', 'btech', 'CSE', 5, 3, '15'),
 (6, 'CS15103', 'Database Management System ', 'btech', 'CSE', 5, 3, '12'),
 (7, 'CS15104', 'Theory Of Computation', 'btech', 'CSE', 5, 3, '13'),
-(8, 'CS15101', 'Artificial Intelligence', 'btech', 'CSE', 5, 3, '13');
+(8, 'CS15101', 'Artificial Intelligence', 'btech', 'CSE', 5, 3, '15');
 
 -- --------------------------------------------------------
+SELECT * FROM subjects WHERE  teacher_id='15';
+
+truncate table subjects;
 
 --
 -- Table structure for table `teacher`
 --
 
 CREATE TABLE `teacher` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL auto_increment primary key,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `branch` enum('CSE','ECE','EEE','ME','CE','HSS','CHEM','PHY') NOT NULL,
@@ -177,6 +185,7 @@ CREATE TABLE `teacher` (
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+drop table teacher;
 --
 -- Dumping data for table `teacher`
 --
@@ -186,6 +195,8 @@ INSERT INTO `teacher` (`id`, `name`, `email`, `branch`, `contact`, `password`) V
 (12, 'Sangram Ray', 'sangram@gmail.com', 'CSE', '48568465153', '$2a$10$GFc5AFFRSjOvdiok4wdPEu2GcXV9zT/sooyhCMqK5/tfY1kCbbYra'),
 (13, 'Krishna Kumar', 'krishna@gmail.com', 'CSE', '4321231', '$2a$10$mAFQAdrlZXyyUR7L8YqB0OBA2wS7sfhPGZuGby6aYrA9m6aRY7muS'),
 (14, 'Bala g', 'balag@gmail.com', 'CSE', '51321321032', '$2a$10$3RRpf98AMNBpi4gofd3JAezVxIzRg0C3yyLifcKkq9yTMidh4CqF2');
+
+select * from teacher;
 
 --
 -- Indexes for dumped tables
@@ -235,7 +246,7 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL primary key AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `teacher`

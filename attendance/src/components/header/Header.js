@@ -24,7 +24,7 @@ const Header = () => {
             <a href='/' className='hover:cursor-pointer flex flex-col'>
             <div className="ml-3 text-xl no-underline">Student Attendance Management System</div>
             </a>
-            <h2 className='ml-3 text-green-500'>National Institute Of Technology Sikkim</h2>
+            <h2 className='ml-3 text-green-500'>Sardar Patel Institute of Technology</h2>
             </div>
           </a>
           {
